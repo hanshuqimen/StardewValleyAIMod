@@ -18,6 +18,7 @@
 - [常见问题 FAQ](#常见问题-faq)
 - [隐私与安全](#隐私与安全)
 - [从源码构建](#从源码构建)
+- [SDK 版本 vs 目标框架](#sdk-版本-vs-目标框架)
 - [架构说明](#架构说明)
 
 ---
@@ -214,9 +215,12 @@ A：Key 只保存在你本机的 `settings.json`（已被 `.gitignore` 排除，
 
 适合想自己改 prompt、加功能或排查问题的开发者。
 
+> 关于「我装的是 .NET 10 SDK，要不要改 TargetFramework？」
+> **不要改。** 详见下面的 [SDK 版本 vs 目标框架](#sdk-版本-vs-目标框架) 说明。
+
 ### 依赖
 
-- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- [.NET SDK](https://dotnet.microsoft.com/download)（.NET 6 / 8 / 10 任意一版均可，**用 .NET 10 SDK 完全没问题**）
 - [SMAPI](https://smapi.io/)（开发用，提供游戏 API 引用）
 - 已安装的星露谷物语 1.6（提供游戏本体程序集）
 
@@ -225,12 +229,23 @@ A：Key 只保存在你本机的 `settings.json`（已被 `.gitignore` 排除，
 ```bash
 git clone https://github.com/hanshuqimen/StardewValleyAIMod.git
 cd StardewValleyAIMod
-dotnet build
+dotnet build -c Release
 ```
 
-构建产物在 `bin/Debug/net6.0/` 下，包含 `StardewValleyAIMod.dll`。把 `StardewValleyAIMod.dll` 和 `manifest.json` 一起放进游戏的 `Mods/StardewValleyAIMod/` 目录即可。
+构建产物在 `bin/Release/net6.0/` 下，包含 `StardewValleyAIMod.dll`。把 `StardewValleyAIMod.dll` 和 `manifest.json` 一起放进游戏的 `Mods/StardewValleyAIMod/` 目录即可。
 
-> 若 `Pathoschild.Stardew.ModBuildConfig` 找不到游戏路径，按提示设置游戏安装目录，或在 `StardewValleyAIMod.csproj` 里用 `<GamePath>` 属性指定。
+> 若 `Pathoschild.Stardew.ModBuildConfig` 找不到游戏路径，按提示设置游戏安装目录，或在 `StardewValleyAIMod.csproj` 里取消注释 `<GamePath>` 行并改成你的游戏安装目录。常见路径：Steam 版 `C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley`。
+
+### SDK 版本 vs 目标框架
+
+这是 .NET mod 开发里最容易踩的坑，单独说明：
+
+| 概念 | 是什么 | 本工程的要求 |
+| --- | --- | --- |
+| **目标框架**（TargetFramework） | 编译出的 DLL 依赖的 .NET 运行时版本 | **必须 `net6.0`**。星露谷 1.6 / SMAPI 4.x 跑在 .NET 6 运行时上，mod 的 DLL 由 SMAPI 加载，必须匹配。改成 `net8.0` / `net10.0` 会导致 SMAPI 加载失败、mod 失效。 |
+| **SDK 版本** | 你本机装的编译工具链版本 | .NET 6 / 8 / 10 任意一版均可。SDK 能编译「低于或等于自身版本」的任何目标框架，所以 **.NET 10 SDK 编译 `net6.0` 工程完全没问题，无需改 `TargetFramework`**。 |
+
+一句话：**装了 .NET 10 SDK，直接 `dotnet build` 即可，输出仍是 `net6.0` 目标、能被 SMAPI 正常加载。** 首次构建时 NuGet 会自动拉取 `net6.0` 引用程序集包，无需额外安装 .NET 6 SDK。
 
 ---
 
