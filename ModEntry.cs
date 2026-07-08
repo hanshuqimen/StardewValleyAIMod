@@ -96,12 +96,18 @@ internal class ModEntry : Mod
     }
 
     /// <summary>在玩家当前所在地点、配置范围内找最近的可对话 NPC。</summary>
+    /// <remarks>
+    /// 这里刻意只用 <c>Character.Position</c>（像素坐标 Vector2）+ <c>Game1.tileSize</c>，
+    /// 而不是 <c>getTileX()</c>/<c>TileX</c> 之类的方法/属性。原因是不同 1.6.x 小版本里
+    /// 这些成员的命名时有变动，直接用最基础的像素坐标换算最稳妥，跨版本都能编过。
+    /// </remarks>
     private NPC? FindNearestNpc()
     {
         var loc = Game1.currentLocation;
         if (loc == null || loc.characters.Count == 0) return null;
 
-        var playerTile = new Vector2(Game1.player.TileX, Game1.player.TileY);
+        // Position 是像素坐标，除以 tileSize(=64) 即得到 tile 坐标。
+        var playerTile = Game1.player.Position / Game1.tileSize;
         NPC? best = null;
         float bestDist = float.MaxValue;
         var range = _settings.InteractionRange;
@@ -109,7 +115,8 @@ internal class ModEntry : Mod
         foreach (var npc in loc.characters)
         {
             if (npc == null || !npc.IsVillager || npc.IsInvisible) continue;
-            var d = Vector2.Distance(playerTile, new Vector2(npc.TileX, npc.TileY));
+            var npcTile = npc.Position / Game1.tileSize;
+            var d = Vector2.Distance(playerTile, npcTile);
             if (d <= range && d < bestDist)
             {
                 bestDist = d;
