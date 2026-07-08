@@ -53,16 +53,13 @@ internal class AiDialogueMenu : IClickableMenu
     {
         var tbX = xPositionOnScreen + 32;
         var tbY = yPositionOnScreen + 180;
-        _textBox = new TextBox(
-            Game1.content.Load<Texture2D>("LooseSprites\\textBox"),
-            Game1.dialogueFont,
-            Game1.textColor)
+        var tbTex = Game1.content.Load<Texture2D>("LooseSprites\\textBox");
+        _textBox = new TextBox(tbTex, tbTex, Game1.dialogueFont, Game1.textColor)
         {
             X = tbX,
             Y = tbY,
             Width = width - 64 - 180,
-            Height = 56,
-            TextLimit = 200
+            Height = 56
         };
         _textBox.Selected = true;
         Game1.keyboardDispatcher.Subscriber = _textBox;
@@ -107,7 +104,7 @@ internal class AiDialogueMenu : IClickableMenu
         }
 
         // 点击输入框区域聚焦
-        _textBox.Selected = _textBox.Bounds.Contains(x, y);
+        _textBox.Selected = new Rectangle(_textBox.X, _textBox.Y, _textBox.Width, _textBox.Height).Contains(x, y);
         base.receiveLeftClick(x, y, playSound);
     }
 

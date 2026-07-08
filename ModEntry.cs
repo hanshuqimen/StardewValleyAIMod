@@ -51,7 +51,7 @@ internal class ModEntry : Mod
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         if (!_settings.IsValid)
-            Game1.addHUDMessage(new HUDMessage("按 K 设置 AI 接口（网址 + API Key），再走到 NPC 旁按 L 对话", HUDMessage.info_type) { noIcon = true });
+            Game1.addHUDMessage(new HUDMessage("按 K 设置 AI 接口（网址 + API Key），再走到 NPC 旁按 L 对话"));
     }
 
     private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
@@ -73,7 +73,7 @@ internal class ModEntry : Mod
         // 没配置就直接引导去设置窗口
         if (!_settings.IsValid)
         {
-            Game1.addHUDMessage(new HUDMessage("尚未配置 AI 接口，已为你打开设置窗口", HUDMessage.info_type) { noIcon = true });
+            Game1.addHUDMessage(new HUDMessage("尚未配置 AI 接口，已为你打开设置窗口"));
             OpenSettings();
             return;
         }
@@ -99,17 +99,17 @@ internal class ModEntry : Mod
     private NPC? FindNearestNpc()
     {
         var loc = Game1.currentLocation;
-        if (loc?.characters == null || loc.characters.Count == 0) return null;
+        if (loc == null || loc.characters.Count == 0) return null;
 
-        var playerTile = Game1.player.getTileLocation();
+        var playerTile = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());
         NPC? best = null;
         float bestDist = float.MaxValue;
         var range = _settings.InteractionRange;
 
         foreach (var npc in loc.characters)
         {
-            if (npc == null || !npc.isVillager() || npc.IsInvisible) continue;
-            var d = Vector2.Distance(playerTile, npc.getTileLocation());
+            if (npc == null || !npc.IsVillager || npc.IsInvisible) continue;
+            var d = Vector2.Distance(playerTile, new Vector2(npc.getTileX(), npc.getTileY()));
             if (d <= range && d < bestDist)
             {
                 bestDist = d;

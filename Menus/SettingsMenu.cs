@@ -71,13 +71,12 @@ internal class SettingsMenu : IClickableMenu
 
         void AddField(string label, string initial, int textLimit, string placeholder)
         {
-            var box = new TextBox(tbTex, Game1.smallFont, Game1.textColor)
+            var box = new TextBox(tbTex, tbTex, Game1.smallFont, Game1.textColor)
             {
                 X = x,
                 Y = y + 28,
                 Width = tbW,
                 Height = 48,
-                TextLimit = textLimit,
                 Text = initial ?? ""
             };
             _fields.Add(new Field { Label = label, Box = box, Placeholder = placeholder });
@@ -131,7 +130,8 @@ internal class SettingsMenu : IClickableMenu
         // 点击某个输入框则切换激活
         for (int i = 0; i < _fields.Count; i++)
         {
-            if (_fields[i].Box.Bounds.Contains(x, y))
+            var b = _fields[i].Box;
+            if (new Rectangle(b.X, b.Y, b.Width, b.Height).Contains(x, y))
             {
                 SetActive(i);
                 return;
