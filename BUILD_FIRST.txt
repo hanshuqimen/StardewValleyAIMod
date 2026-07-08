@@ -1,0 +1,48 @@
+星露谷物语 AI 对话 mod — 源码包
+================================
+
+本压缩包是「源码 release」，**不包含编译好的 DLL**。请按以下步骤编译后再放入游戏使用。
+
+一、为什么没有 DLL
+-------------------
+mod 依赖星露谷物语本体的程序集（StardewValley.dll 等），这些文件受版权保护、不能随源码分发。
+因此需要你在「自己装有游戏的电脑」上编译一次。
+
+二、编译前提
+------------
+1. 已安装《星露谷物语 Stardew Valley》1.6
+2. 已安装 SMAPI 3.14 或更高（https://smapi.io/）
+3. 已安装 .NET 6 SDK（https://dotnet.microsoft.com/download/dotnet/6.0）
+
+三、编译步骤
+------------
+Windows 打开「PowerShell」/ macOS、Linux 打开「终端」，执行：
+
+    cd <解压后的本目录>
+    dotnet build -c Release
+
+编译成功后，产物位于：
+
+    bin/Release/net6.0/StardewValleyAIMod.dll
+
+四、安装到游戏
+--------------
+1. 在游戏的 Mods 目录下新建文件夹 StardewValleyAIMod
+   （例如 Windows: C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\StardewValleyAIMod）
+2. 把以下两个文件放进去：
+       - manifest.json                 （本目录里就有）
+       - bin/Release/net6.0/StardewValleyAIMod.dll   （上一步编译产物）
+3. 用 SMAPI 启动游戏，看到控制台输出「AI 对话 mod 已加载」即安装成功。
+
+五、使用方法
+------------
+1. 进游戏按 K 打开「AI 设置窗口」，填写你选用的 AI 网址、API Key、模型名称，点「测试连接」再「保存」。
+2. 走到任意主要 NPC 附近按 L，输入文字回车，即可与 NPC 的 AI 对话。
+3. 详细说明见 README.md。
+
+六、如果编译失败
+----------------
+- 提示「can't find your game folder」：
+  用文本编辑器打开 StardewValleyAIMod.csproj，在 <Project> 节点内加一行（改成你的游戏路径）：
+      <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley</GamePath>
+- 其它问题：见 README.md 的「从源码构建」与「常见问题 FAQ」。
