@@ -1,0 +1,10 @@
+{
+    "Name": "Stardew Valley AI Dialogue",
+    "Author": "AI Dialogue Mod",
+    "Version": "1.0.0",
+    "Description": "让星露谷的主要 NPC 接入 AI 对话。玩家自行配置 API URL 与 Key，mod 仅作请求中转。",
+    "UniqueID": "aiDialogue.stardewvalley",
+    "EntryDll": "StardewValleyAIMod",
+    "MinimumApiVersion": "3.14.0",
+    "UpdateKeys": []
+}
