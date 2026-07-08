@@ -16,3 +16,6 @@ Thumbs.db
 
 # Local config that may contain secrets
 config.local.json
+
+# 玩家在游戏内设置窗口填写的 AI 网址 / Key（含敏感信息，禁止提交）
+settings.json

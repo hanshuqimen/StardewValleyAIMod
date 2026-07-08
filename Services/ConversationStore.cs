@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using StardewValleyAIMod.Services;
 
 namespace StardewValleyAIMod.Services;
 
@@ -8,23 +7,19 @@ namespace StardewValleyAIMod.Services;
 /// </summary>
 internal class ConversationStore
 {
-    private readonly ModConfig _config;
+    private readonly ModSettings _settings;
     private readonly Dictionary<string, List<ChatMessage>> _history = new();
 
-    public ConversationStore(ModConfig config) => _config = config;
+    public ConversationStore(ModSettings settings) => _settings = settings;
 
-    /// <summary>
-    /// 取出某 NPC 的历史（只读副本，调用方可安全使用）。
-    /// </summary>
+    /// <summary>取出某 NPC 的历史（只读副本，调用方可安全使用）。</summary>
     public IReadOnlyList<ChatMessage> Get(string npcName)
     {
         if (!_history.TryGetValue(npcName, out var list)) return System.Array.Empty<ChatMessage>();
         return list.ToArray();
     }
 
-    /// <summary>
-    /// 追加一轮 user/assistant 消息，并按配置裁剪长度。
-    /// </summary>
+    /// <summary>追加一轮 user/assistant 消息，并按设置裁剪长度。</summary>
     public void Append(string npcName, string userText, string assistantText)
     {
         if (!_history.TryGetValue(npcName, out var list))
@@ -33,7 +28,7 @@ internal class ConversationStore
         list.Add(new ChatMessage { Role = "user", Content = userText });
         list.Add(new ChatMessage { Role = "assistant", Content = assistantText });
 
-        var keep = _config.ConversationHistoryLength * 2;
+        var keep = _settings.ConversationHistoryLength * 2;
         if (list.Count > keep && keep > 0)
             list.RemoveRange(0, list.Count - keep);
     }

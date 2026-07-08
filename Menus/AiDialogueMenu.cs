@@ -14,14 +14,14 @@ namespace StardewValleyAIMod.Menus;
 
 /// <summary>
 /// AI 对话菜单：顶部显示 NPC 名字，中间是输入框，下方有"发送"按钮和回复区。
-/// 玩家在此输入要问 NPC 的话，mod 把消息转发给 AI 后把回复显示出来。
+/// 玩家在此输入要问 NPC 的话，mod 把消息转发给玩家配置的 AI 后把回复显示出来。
 /// </summary>
 internal class AiDialogueMenu : IClickableMenu
 {
     private readonly NPC _npc;
     private readonly AiService _ai;
     private readonly ConversationStore _store;
-    private readonly ModConfig _config;
+    private readonly ModSettings _settings;
     private readonly IMonitor _monitor;
 
     private TextBox _textBox = null!;
@@ -32,13 +32,13 @@ internal class AiDialogueMenu : IClickableMenu
     private bool _busy;
     private CancellationTokenSource? _cts;
 
-    public AiDialogueMenu(NPC npc, AiService ai, ConversationStore store, ModConfig config, IMonitor monitor)
+    public AiDialogueMenu(NPC npc, AiService ai, ConversationStore store, ModSettings settings, IMonitor monitor)
         : base(0, 0, 0, 0, showUpperRightCloseButton: true)
     {
         _npc = npc;
         _ai = ai;
         _store = store;
-        _config = config;
+        _settings = settings;
         _monitor = monitor;
 
         width = Math.Min(620, Game1.uiViewport.Width - 40);
@@ -135,13 +135,13 @@ internal class AiDialogueMenu : IClickableMenu
         _cts = new CancellationTokenSource();
 
         string systemPrompt = CharacterPrompts.GetPrompt(_npc.Name);
-        if (!string.IsNullOrWhiteSpace(_config.ExtraSystemInstruction))
-            systemPrompt += "\n附加要求：" + _config.ExtraSystemInstruction;
+        if (!string.IsNullOrWhiteSpace(_settings.ExtraSystemInstruction))
+            systemPrompt += "\n附加要求：" + _settings.ExtraSystemInstruction;
 
         try
         {
             // 首次对话前可选预热
-            if (_config.SendPrimingRequest)
+            if (_settings.SendPrimingRequest)
                 await _ai.PrimeAsync(_npc.Name, systemPrompt, _cts.Token).ConfigureAwait(false);
 
             var history = _store.Get(_npc.Name);
