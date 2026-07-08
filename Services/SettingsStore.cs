@@ -5,11 +5,6 @@ using StardewModdingAPI;
 
 namespace StardewValleyAIMod.Services;
 
-/// <summary>
-/// 负责把玩家在设置窗口里填写的 <see cref="ModSettings"/> 读写到 mod 目录下的
-/// settings.json。这样玩家"安装 mod 即可用"——无需改代码、无需配置环境，
-/// 进游戏按设置键填好网址和 Key 即可。
-/// </summary>
 internal class SettingsStore
 {
     private readonly string _path;
@@ -21,7 +16,6 @@ internal class SettingsStore
         _monitor = monitor;
     }
 
-    /// <summary>读取设置；文件不存在或损坏时返回带默认值的实例。</summary>
     public ModSettings Load()
     {
         var s = new ModSettings();
@@ -53,7 +47,6 @@ internal class SettingsStore
         return s;
     }
 
-    /// <summary>保存设置到 settings.json。</summary>
     public void Save(ModSettings settings)
     {
         try

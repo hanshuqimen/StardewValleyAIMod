@@ -10,26 +10,17 @@ using StardewModdingAPI;
 
 namespace StardewValleyAIMod.Services;
 
-/// <summary>
-/// 一条对话消息（OpenAI chat 格式）。
-/// </summary>
 internal class ChatMessage
 {
     [JsonPropertyName("role")] public string Role { get; set; } = "";
     [JsonPropertyName("content")] public string Content { get; set; } = "";
 }
 
-/// <summary>
-/// AI 服务：纯请求中转。mod 自身不做任何模型推理，只把玩家在设置窗口填写的
-/// URL/Key/Model 拼成 OpenAI 兼容的 chat/completions 请求转发出去，再把模型返回的
-/// 文本交回游戏。Authorization 头现拼现发，不缓存密钥。
-/// </summary>
 internal class AiService : IDisposable
 {
     private readonly ModSettings _settings;
     private readonly IMonitor _monitor;
 
-    /// <summary>每个 NPC 是否已完成首次"人设预热"请求。</summary>
     private readonly HashSet<string> _primed = new();
 
     public AiService(ModSettings settings, IMonitor monitor)
@@ -38,10 +29,6 @@ internal class AiService : IDisposable
         _monitor = monitor;
     }
 
-    /// <summary>
-    /// 在首次正式对话前，向目标接口发送一条仅含 system 消息的请求，用于"塑造人设"。
-    /// 仅在 <see cref="ModSettings.SendPrimingRequest"/> = true 时调用。
-    /// </summary>
     public async Task PrimeAsync(string npcName, string systemPrompt, CancellationToken ct = default)
     {
         if (_primed.Contains(npcName)) return;
@@ -64,10 +51,6 @@ internal class AiService : IDisposable
         }
     }
 
-    /// <summary>
-    /// 发送一轮对话并把模型回复文本返回。
-    /// <paramref name="history"/> 为之前的轮次（role=user/assistant 交替）。
-    /// </summary>
     public async Task<string> SendAsync(
         string npcName,
         string systemPrompt,
@@ -109,10 +92,6 @@ internal class AiService : IDisposable
         return ParseAssistantContent(json);
     }
 
-    /// <summary>
-    /// 用玩家在设置窗口临时填写的网址/Key/模型发一条最小请求，验证连通性。
-    /// 不会动用已保存设置，便于玩家"先测试再保存"。
-    /// </summary>
     public async Task<(bool Ok, string Message)> TestAsync(
         string url, string key, string model, CancellationToken ct = default)
     {
@@ -132,7 +111,6 @@ internal class AiService : IDisposable
         try
         {
             var json = await PostRawAsync(body, url, key, ct).ConfigureAwait(false);
-            // 只要返回 200 且能解析就认为成功
             _ = ParseAssistantContent(json);
             return (true, "连接成功！可以保存后开始对话。");
         }
@@ -146,7 +124,6 @@ internal class AiService : IDisposable
         }
     }
 
-    /// <summary>实际发出 POST 请求并返回响应体字符串。Authorization 头只在这里拼一次。</summary>
     private static async Task<string> PostRawAsync(object body, string url, string key, CancellationToken ct)
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
@@ -165,7 +142,6 @@ internal class AiService : IDisposable
         return text;
     }
 
-    /// <summary>从 OpenAI 兼容响应里提取 choices[0].message.content。</summary>
     private static string ParseAssistantContent(string json)
     {
         using var doc = JsonDocument.Parse(json);

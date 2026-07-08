@@ -12,10 +12,6 @@ using StardewValleyAIMod.Services;
 
 namespace StardewValleyAIMod.Menus;
 
-/// <summary>
-/// AI 对话菜单：顶部显示 NPC 名字，中间是输入框，下方有"发送"按钮和回复区。
-/// 玩家在此输入要问 NPC 的话，mod 把消息转发给玩家配置的 AI 后把回复显示出来。
-/// </summary>
 internal class AiDialogueMenu : IClickableMenu
 {
     private readonly NPC _npc;
@@ -88,7 +84,6 @@ internal class AiDialogueMenu : IClickableMenu
 
     public override void receiveLeftClick(int x, int y, bool playSound = true)
     {
-        // 关闭按钮在任意时刻都可用（会取消进行中的请求）
         if (_closeButton.containsPoint(x, y))
         {
             Close();
@@ -103,7 +98,6 @@ internal class AiDialogueMenu : IClickableMenu
             return;
         }
 
-        // 点击输入框区域聚焦
         _textBox.Selected = new Rectangle(_textBox.X, _textBox.Y, _textBox.Width, _textBox.Height).Contains(x, y);
         base.receiveLeftClick(x, y, playSound);
     }
@@ -137,7 +131,6 @@ internal class AiDialogueMenu : IClickableMenu
 
         try
         {
-            // 首次对话前可选预热
             if (_settings.SendPrimingRequest)
                 await _ai.PrimeAsync(_npc.Name, systemPrompt, _cts.Token).ConfigureAwait(false);
 
@@ -148,7 +141,6 @@ internal class AiDialogueMenu : IClickableMenu
             _reply = reply;
             _store.Append(_npc.Name, text, reply);
 
-            // 同时把回复推入 NPC 原生对话队列，方便用游戏内对话气泡复看
             try
             {
                 _npc.CurrentDialogue.Push(new Dialogue(_npc, "AI_" + _npc.Name, reply));
@@ -180,22 +172,17 @@ internal class AiDialogueMenu : IClickableMenu
 
     public override void draw(SpriteBatch b)
     {
-        // 半透明遮罩
         b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.5f);
 
-        // 面板
         drawTextureBox(b, Game1.mouseCursors, new Rectangle(0, 256, 60, 60),
             xPositionOnScreen, yPositionOnScreen, width, height, Color.White, drawShadow: true);
 
-        // 标题：NPC 名字
         var title = $"{_npc.displayName ?? _npc.Name} · AI 对话";
         DrawText(b, title, new Vector2(xPositionOnScreen + 32, yPositionOnScreen + 28), Game1.dialogueFont, Color.PaleGoldenrod);
 
-        // 提示
         var hint = CharacterPrompts.HasPrompt(_npc.Name) ? "（已加载角色人设）" : "（无专属人设，使用通用设定）";
         DrawText(b, hint, new Vector2(xPositionOnScreen + 32, yPositionOnScreen + 76), Game1.smallFont, Color.LightGray);
 
-        // 回复区
         var replyLabel = _busy ? "回复中……" : "回复：";
         DrawText(b, replyLabel, new Vector2(xPositionOnScreen + 32, yPositionOnScreen + 110), Game1.smallFont, Color.Wheat);
         if (!string.IsNullOrEmpty(_reply))
@@ -204,12 +191,9 @@ internal class AiDialogueMenu : IClickableMenu
             DrawText(b, wrapped, new Vector2(xPositionOnScreen + 32, yPositionOnScreen + 132), Game1.smallFont, Color.White);
         }
 
-        // 输入框
         _textBox.Draw(b);
 
-        // 发送按钮
         DrawButton(b, _sendButton, "发送", _busy ? Color.Gray : Color.LightGreen);
-        // 关闭按钮
         DrawButton(b, _closeButton, "关闭", Color.Salmon);
 
         drawMouse(b);
@@ -217,7 +201,6 @@ internal class AiDialogueMenu : IClickableMenu
 
     private static void DrawText(SpriteBatch b, string text, Vector2 pos, SpriteFont font, Color color)
     {
-        // 先画一层暗色阴影，再画正文
         b.DrawString(font, text, pos + new Vector2(1, 1), Color.Black * 0.4f);
         b.DrawString(font, text, pos, color);
     }

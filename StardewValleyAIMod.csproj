@@ -1,24 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <!--
-      ============================================================
-      关于目标框架（重要，请勿随意修改）
-      ============================================================
-      TargetFramework 必须保持 net6.0，原因：
-        星露谷物语 1.6 与 SMAPI 4.x 运行在 .NET 6 运行时之上，
-        mod 的 DLL 由 SMAPI 加载，必须与该运行时匹配。
-        若改成 net8.0 / net10.0，SMAPI 会因运行时版本不匹配而
-        无法加载 mod，游戏内 mod 完全失效。
-
-      关于 SDK 版本：
-        安装 .NET 6 / 8 / 10 任意一版 SDK 均可编译本工程。
-        SDK 可以编译「低于或等于自身版本」的任何目标框架，
-        因此用 .NET 10 SDK 编译 net6.0 工程完全没问题。
-        （首次构建时 NuGet 会自动拉取 net6.0 引用程序集包。）
-
-      构建产物路径：bin\Release\net6.0\StardewValleyAIMod.dll
-      （无论用哪个 SDK，输出目录都按目标框架命名为 net6.0）
-    -->
     <PropertyGroup>
         <AssemblyName>StardewValleyAIMod</AssemblyName>
         <RootNamespace>StardewValleyAIMod</RootNamespace>
@@ -27,12 +8,6 @@
         <Nullable>enable</Nullable>
         <PlatformTarget>x64</PlatformTarget>
         <EnableHarmony>true</EnableHarmony>
-
-        <!--
-          如果 ModBuildConfig 报「can't find your game folder」，
-          取消下面一行注释，把路径改成你本机的星露谷安装目录：
-        -->
-        <!--<GamePath>C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley</GamePath>-->
     </PropertyGroup>
 
     <ItemGroup>

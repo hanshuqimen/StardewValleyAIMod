@@ -7,17 +7,6 @@ using StardewValleyAIMod.Services;
 
 namespace StardewValleyAIMod;
 
-/// <summary>
-/// mod 入口。负责加载快捷键与 AI 设置、初始化中转服务、监听快捷键：
-/// - 按 K 打开「AI 设置窗口」，玩家在其中输入网址/API/模型，无需改代码、无需配置环境；
-/// - 按 L 站在 NPC 附近打开「AI 对话窗口」，mod 把消息转发给玩家填写的接口。
-///
-/// 架构说明：
-/// - mod 不做任何模型推理，所有 AI 能力都来自玩家在设置窗口填写的
-///   ApiUrl / ApiKey / Model，<see cref="AiService"/> 只负责把请求转发出去。
-/// - 每轮对话（或首次对话前的预热请求）会把 <see cref="Data.CharacterPrompts"/>
-///   里对应 NPC 的人设作为 system 消息发给目标接口，用于塑造角色、避免出戏。
-/// </summary>
 internal class ModEntry : Mod
 {
     private ModConfig _config = null!;
@@ -56,10 +45,8 @@ internal class ModEntry : Mod
 
     private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
     {
-        // 已有菜单打开时不抢
         if (Game1.activeClickableMenu != null) return;
 
-        // 设置键：任何可操作状态下都能打开（即便没存档也允许，方便玩家先填好）
         if (_config.SettingsKey.JustPressed())
         {
             OpenSettings();
@@ -70,7 +57,6 @@ internal class ModEntry : Mod
         if (Game1.currentLocation == null || Game1.player == null) return;
         if (!Context.IsPlayerFree) return;
 
-        // 没配置就直接引导去设置窗口
         if (!_settings.IsValid)
         {
             Game1.addHUDMessage(new HUDMessage("尚未配置 AI 接口，已为你打开设置窗口"));
@@ -95,18 +81,11 @@ internal class ModEntry : Mod
         Game1.playSound("bigSelect");
     }
 
-    /// <summary>在玩家当前所在地点、配置范围内找最近的可对话 NPC。</summary>
-    /// <remarks>
-    /// 这里刻意只用 <c>Character.Position</c>（像素坐标 Vector2）+ <c>Game1.tileSize</c>，
-    /// 而不是 <c>getTileX()</c>/<c>TileX</c> 之类的方法/属性。原因是不同 1.6.x 小版本里
-    /// 这些成员的命名时有变动，直接用最基础的像素坐标换算最稳妥，跨版本都能编过。
-    /// </remarks>
     private NPC? FindNearestNpc()
     {
         var loc = Game1.currentLocation;
         if (loc == null || loc.characters.Count == 0) return null;
 
-        // Position 是像素坐标，除以 tileSize(=64) 即得到 tile 坐标。
         var playerTile = Game1.player.Position / Game1.tileSize;
         NPC? best = null;
         float bestDist = float.MaxValue;

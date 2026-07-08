@@ -2,16 +2,8 @@ using System.Collections.Generic;
 
 namespace StardewValleyAIMod.Data;
 
-/// <summary>
-/// 星露谷主要 NPC 的人设塑造 prompt。
-/// 这些 prompt 会在每轮对话前以 system 消息形式（或预热请求）发给玩家接入的 AI，
-/// 让模型扮演对应角色，避免出戏。玩家可在 config 中追加额外指令。
-/// </summary>
 internal static class CharacterPrompts
 {
-    /// <summary>
-    /// 所有 NPC 共用的基础规则，会拼到具体角色 prompt 前面。
-    /// </summary>
     public const string BaseRule =
         "你正在扮演《星露谷物语》(Stardew Valley) 中的一个角色，与刚搬到鹈鹕镇的农场主（玩家）对话。" +
         "请严格遵守以下规则：\n" +
@@ -22,9 +14,6 @@ internal static class CharacterPrompts
         "4. 不知道玩家真实身份，只知道对方是继承了爷爷农场的农场主。\n" +
         "5. 回复简短自然，像 NPC 平时说话，不要长篇大论或列清单。\n";
 
-    /// <summary>
-    /// 主要 NPC 的专属人设。key 对应游戏内 NPC.Name。
-    /// </summary>
     public static readonly Dictionary<string, string> Prompts = new()
     {
         ["Abigail"] =
@@ -176,9 +165,6 @@ internal static class CharacterPrompts
             "你说话轻声细语、字句不多。"
     };
 
-    /// <summary>
-    /// 获取某个 NPC 的人设 prompt。找不到时返回一个通用版本。
-    /// </summary>
     public static string GetPrompt(string npcName)
     {
         if (!string.IsNullOrEmpty(npcName) && Prompts.TryGetValue(npcName, out var p))
@@ -188,9 +174,6 @@ internal static class CharacterPrompts
         return BaseRule + "\n角色设定：你是鹈鹕镇的一位普通居民，性格平和友善。";
     }
 
-    /// <summary>
-    /// 判断某 NPC 是否有专属人设。
-    /// </summary>
     public static bool HasPrompt(string npcName)
         => !string.IsNullOrEmpty(npcName) && Prompts.ContainsKey(npcName);
 }
