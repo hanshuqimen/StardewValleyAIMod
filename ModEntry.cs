@@ -101,7 +101,7 @@ internal class ModEntry : Mod
         var loc = Game1.currentLocation;
         if (loc == null || loc.characters.Count == 0) return null;
 
-        var playerTile = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());
+        var playerTile = new Vector2(Game1.player.TileX, Game1.player.TileY);
         NPC? best = null;
         float bestDist = float.MaxValue;
         var range = _settings.InteractionRange;
@@ -109,7 +109,7 @@ internal class ModEntry : Mod
         foreach (var npc in loc.characters)
         {
             if (npc == null || !npc.IsVillager || npc.IsInvisible) continue;
-            var d = Vector2.Distance(playerTile, new Vector2(npc.getTileX(), npc.getTileY()));
+            var d = Vector2.Distance(playerTile, new Vector2(npc.TileX, npc.TileY));
             if (d <= range && d < bestDist)
             {
                 bestDist = d;
